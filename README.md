@@ -1,5 +1,6 @@
 #  Spark
 
+<<<<<<< HEAD
 + 内含模块
 
   Spark SQL
@@ -17,6 +18,9 @@
 安装spark(需要提前安装Scala
 ----------------
 
+=======
+## 安装spark(需要提前安装Scala)
+>>>>>>> dc536a890bd0452413a83d6585867b853ce68546
 + 下载spark软件包
   	http://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.7.tgz
 + tar
@@ -132,6 +136,7 @@ object WordCountScala {
 }
 
 ```
+<<<<<<< HEAD
 
 ## 最高气温排序
 
@@ -291,3 +296,5 @@ public class TempAgg {
 
 ```
 
+=======
+>>>>>>> dc536a890bd0452413a83d6585867b853ce68546
