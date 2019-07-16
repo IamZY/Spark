@@ -37,6 +37,7 @@ public class TaggenJava {
             }
         });
 
+        // 过滤
         JavaPairRDD<String, List<String>> rdd3 = rdd2.filter(new Function<Tuple2<String, List<String>>, Boolean>() {
             public Boolean call(Tuple2<String, List<String>> t) throws Exception {
                 return (t._2 != null && !t._2.isEmpty());
@@ -51,6 +52,8 @@ public class TaggenJava {
         });
 
 
+
+        // 变换 标一成对
         JavaPairRDD<Tuple2<String, String>, Integer> rdd5 = rdd4.mapToPair(new PairFunction<Tuple2<String, String>, Tuple2<String, String>, Integer>() {
             public Tuple2<Tuple2<String, String>, Integer> call(Tuple2<String, String> v1) throws Exception {
                 return new Tuple2<Tuple2<String, String>, Integer>(v1, 1);
@@ -58,21 +61,28 @@ public class TaggenJava {
         });
 
 
+
+
+        // 聚合 ((75144086,美发师手艺好),3)
         JavaPairRDD<Tuple2<String, String>, Integer> rdd6 = rdd5.reduceByKey(new Function2<Integer, Integer, Integer>() {
             public Integer call(Integer v1, Integer v2) throws Exception {
                 return v1 + v2;
             }
         });
 
-        
+
+
+        // 重组
         JavaPairRDD<String, Tuple2<String, Integer>> rdd7 = rdd6.mapToPair(new PairFunction<Tuple2<Tuple2<String, String>, Integer>, String, Tuple2<String,Integer>>() {
             public Tuple2<String, Tuple2<String, Integer>> call(Tuple2<Tuple2<String, String>, Integer> t) throws Exception {
                 return new Tuple2<String, Tuple2<String, Integer>>(t._1._1,new Tuple2<String, Integer>(t._1._2,t._2));
             }
         });
 
+        // 分组
         JavaPairRDD<String, Iterable<Tuple2<String, Integer>>> rdd8 = rdd7.groupByKey();
 
+        // 商家内排序
         JavaPairRDD<String, List<Tuple2<String, Integer>>> rdd9 = rdd8.mapValues(new Function<Iterable<Tuple2<String, Integer>>, List<Tuple2<String,Integer>>>() {
             public List<Tuple2<String, Integer>> call(Iterable<Tuple2<String, Integer>> it) throws Exception {
                 List<Tuple2<String,Integer>> newList = new ArrayList<Tuple2<String, Integer>>();
@@ -89,17 +99,23 @@ public class TaggenJava {
             }
         });
 
-//        JavaPairRDD<String, List<Tuple2<String, Integer>>> rdd10 = rdd9.map(new Function<Tuple2<String, List<Tuple2<String, Integer>>>, Tuple2<String, List<Tuple2<String, Integer>>>>() {
-//            @Override
-//            public Tuple2<String, List<Tuple2<String, Integer>>> call(Tuple2<String, List<Tuple2<String, Integer>>> v2) throws Exception {
-//                return v2;
-//            }
-//        });
 
-        List list = rdd4.collect();
+        //10.将pair变换成rdd
+        JavaRDD<Tuple2<String, List<Tuple2<String, Integer>>>> rdd10 = rdd9.map(new Function<Tuple2<String,List<Tuple2<String,Integer>>>, Tuple2<String, List<Tuple2<String, Integer>>>>() {
+            public Tuple2<String, List<Tuple2<String, Integer>>> call(Tuple2<String, List<Tuple2<String, Integer>>> t) throws Exception {
+                return t;
+            }
+        }) ;
+        //11.商家间排序
+        JavaRDD<Tuple2<String, List<Tuple2<String, Integer>>>> rdd11 = rdd10.sortBy(new Function<Tuple2<String,List<Tuple2<String,Integer>>>, Integer>() {
+            public Integer call(Tuple2<String, List<Tuple2<String, Integer>>> t) throws Exception {
+                return t._2.get(0)._2;
+            }
+        }, false, 1);
 
+        List list = rdd11.collect() ;
 
-        for (Object o : list) {
+        for(Object o : rdd9.collect()){
             System.out.println(o);
         }
 
