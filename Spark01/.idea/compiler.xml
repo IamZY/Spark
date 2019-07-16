@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="myspark" />
+        <module name="taggen" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="myspark" target="1.5" />
+      <module name="taggen" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
