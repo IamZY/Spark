@@ -5,6 +5,7 @@
       <list>
         <option value="$PROJECT_DIR$/myspark/pom.xml" />
         <option value="$PROJECT_DIR$/taggen/pom.xml" />
+        <option value="$PROJECT_DIR$/myspark-sql/pom.xml" />
       </list>
     </option>
   </component>

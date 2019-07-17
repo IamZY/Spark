@@ -1,7 +1,7 @@
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
-object WordCountScala {
+object WordCountScalaWithClassType {
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
     conf.setAppName("WordCountScala")
