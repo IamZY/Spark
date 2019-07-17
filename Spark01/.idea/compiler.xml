@@ -8,12 +8,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="myspark-sql" />
         <module name="taggen" />
+        <module name="myspark-streaming" />
         <module name="myspark" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="myspark" target="1.5" />
       <module name="myspark-sql" target="1.5" />
+      <module name="myspark-streaming" target="1.5" />
       <module name="taggen" target="8" />
     </bytecodeTargetLevel>
   </component>

@@ -15,12 +15,12 @@
 ## spark集群模式
 + local
   	本地模式
-  	不需要启动任何进程。同一jvm中使用多线程模拟.
+    	不需要启动任何进程。同一jvm中使用多线程模拟.
 + standalone
   	独立模式
-  	启动进程
-  	master
-  	worker
+    	启动进程
+    	master
+    	worker
 + mesos
   	-
 + yarn
@@ -412,20 +412,695 @@ public class TempAgg {
 
   + 编写scala代码
 
+  + ```scala
+    import org.apache.spark.sql.SparkSession
+    
+    object SparkSQLDemo2 {
+      def main(args: Array[String]): Unit = {
+        val spark = SparkSession.builder().appName("sparkSQL").master("local[*]").enableHiveSupport().getOrCreate()
+    
+        val rdd1 = spark.sparkContext.textFile("/user/zangyang.txt")
+    
+        val rdd2 = rdd1.flatMap(_.split(" "))
+        // 导入SparkSession的隐式转换
+        import spark.implicits._
+        // 将rdd转换成数据框
+        val df = rdd2.toDF("word")
+        // 将数据框注册成临时视图
+        df.createOrReplaceTempView("_doc")
+    
+        spark.sql("select word,count(*) from _doc group by word").show(1000,false)
+      }
+    }
+    
+    ```
 
++ Java
 
+  源数据：
 
+  1,smith,12
+  2,bob,13
+  3,alex,14
+  4,alice,15
+  5,mike,16
 
+  
 
+  1,t001,100.9,1
+  2,t002,132.9,1
+  3,t001,123.9,2
+  4,t003,111.9,2
+  5,t001,121.9,2
+  6,t003,102.9,4
+  7,t002,105.9,3
+  8,t001,104.9,3
+  9,t002,130.9,3
+  10,t002,120.9,4
 
+  ```java
+  package big13.spark.sql;
+  
+  import org.apache.spark.api.java.JavaRDD;
+  import org.apache.spark.api.java.JavaSparkContext;
+  import org.apache.spark.api.java.function.FlatMapFunction;
+  import org.apache.spark.api.java.function.Function;
+  import org.apache.spark.sql.Dataset;
+  import org.apache.spark.sql.Row;
+  import org.apache.spark.sql.RowFactory;
+  import org.apache.spark.sql.SparkSession;
+  import org.apache.spark.sql.types.DataTypes;
+  import org.apache.spark.sql.types.Metadata;
+  import org.apache.spark.sql.types.StructField;
+  import org.apache.spark.sql.types.StructType;
+  import org.codehaus.janino.Java;
+  
+  import java.util.Arrays;
+  import java.util.Iterator;
+  
+  /**
+   * 使用java实现Spark SQL 访问
+   */
+  public class SparkSQLDemoJava3 {
+      public static void main(final String[] args) {
+          SparkSession spark = SparkSession.builder().appName("sparkSQL").master("local").enableHiveSupport().getOrCreate();
+          // 上下文
+          JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+  
+  
+          // custs
+          JavaRDD<String> c_rdd1 = sc.textFile("/user/custs.txt");
+          JavaRDD<Row> c_rdd2 = c_rdd1.map(new Function<String, Row>() {
+              public Row call(String s) throws Exception {
+                  String[] arr = s.split(",");
+                  Integer id = Integer.parseInt(arr[0]);
+                  String name = arr[1];
+                  Integer age = Integer.parseInt(arr[2]);
+                  return RowFactory.create(id, name, age);
+              }
+          });
+  
+          StructField[] c_fileds = new StructField[3];
+          c_fileds[0] = new StructField("id", DataTypes.IntegerType, false, Metadata.empty());
+          c_fileds[1] = new StructField("name", DataTypes.StringType, false, Metadata.empty());
+          c_fileds[2] = new StructField("age", DataTypes.IntegerType, false, Metadata.empty());
+          StructType c_type = new StructType(c_fileds);
+          Dataset<Row> c_df1 = spark.createDataFrame(c_rdd2, c_type);
+          // 注册临时视图
+          c_df1.createOrReplaceTempView("_custs");
+  
+          // order
+          JavaRDD<String> o_rdd1 = sc.textFile("/user/order.txt");
+          JavaRDD<Row> o_rdd2 = o_rdd1.map(new Function<String, Row>() {
+              public Row call(String s) throws Exception {
+                  String[] arr = s.split(",");
+                  Integer id = Integer.parseInt(arr[0]);
+                  String orderno = arr[1];
+                  Float price = Float.parseFloat(arr[2]);
+                  Integer cid = Integer.parseInt(arr[3]);
+                  return RowFactory.create(id, orderno, price, cid);
+              }
+          });
+  
+          StructField[] o_fileds = new StructField[4];
+          o_fileds[0] = new StructField("id", DataTypes.IntegerType, false, Metadata.empty());
+          o_fileds[1] = new StructField("orderno", DataTypes.StringType, false, Metadata.empty());
+          o_fileds[2] = new StructField("price", DataTypes.FloatType, false, Metadata.empty());
+          o_fileds[3] = new StructField("cid", DataTypes.IntegerType, false, Metadata.empty());
+          StructType o_type = new StructType(o_fileds);
+          Dataset<Row> o_df1 = spark.createDataFrame(o_rdd2, o_type);
+          o_df1.createOrReplaceTempView("_orders");
+  
+  
+          /**************************/
+  //        spark.sql("select * from _custs").show(1000,false);
+  //        spark.sql("select * from _orders").show(1000,false);
+  
+  
+          String sql = "select c.id,c.name,ifnull(o._sum,0) as totalPrice from _custs " +
+                  "as c left outer join " +
+                  "(select cid,sum(price) as _sum from _orders group by cid) as o on o.cid=c.id";
+          spark.sql(sql).show(1000,false);
+  
+      }
+  }
+  
+  ```
 
++ 将dataframe 写入 Json
 
+  ```java
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * 将DataFrame保存json
+    */
+  object SparkSQLJsonWriteDemo {
+    def main(args: Array[String]): Unit = {
+      val spark = SparkSession.builder().appName("sparkSQL").master("local[*]").enableHiveSupport().getOrCreate()
+      val rdd1 = spark.sparkContext.textFile("/user/custs.txt")
+      import spark.implicits._
+      val df1 = rdd1.map(line=>{
+        val arr = line.split(",")
+        (arr(0).toInt,arr(1),arr(2).toInt)
+      }).toDF("id","name","age")
+      df1.show(1000,false)
+      df1.where("id > 2").write.json("file:///e:/json")
+    }
+  }
+  
+  ```
 
++ 将Json数据转换成DataFrame
 
+  ```java
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * 加载Json数据成DataFrame
+    */
+  object SparkSQLJsonReadDemo {
+    def main(args: Array[String]): Unit = {
+      val spark = SparkSession.builder().appName("sparkSQL").master("local[*]").enableHiveSupport().getOrCreate()
+      val df1 = spark.read.json("file:///e:/json")
+      df1.show(1000,false)
+    }
+  }
+  
+  ```
 
++ parquet的读取与保存 （hive的线性存储）
 
++ mysql的读取与存储    (表不能存在)
 
+  ```java
+  import java.util.Properties
+  
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * 将DataFrame保存json
+    */
+  object SparkSQLJDBCWriteDemo {
+    def main(args: Array[String]): Unit = {
+      val spark = SparkSession.builder().appName("sparkSQL").master("local[*]").enableHiveSupport().getOrCreate()
+      val rdd1 = spark.sparkContext.textFile("/user/custs.txt")
+  
+      import spark.implicits._
+  
+      val df1 = rdd1.map(line => {
+        val arr = line.split(",")
+        (arr(0).toInt, arr(1), arr(2).toInt)
+      }).toDF("id", "name", "age")
+  
+      df1.show(1000, false)
+      val url = "jdbc:mysql://localhost:3306.big13"
+      var table = "custs"
+      val prop = new Properties()
+      prop.put("drivers", "com.mysql.jdbc.Driver")
+      prop.put("user", "root")
+      prop.put("password", "123456")
+      df1.where("id > 2").write.jdbc(url, table, prop)
+  
+  
+    }
+  }
+  
+  ```
 
+  ```java
+  import java.util.Properties
+  
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * 将DataFrame保存json
+    */
+  object SparkSQLJBDCReadDemo {
+    def main(args: Array[String]): Unit = {
+      val spark = SparkSession.builder().appName("sparkSQL").master("local[*]").enableHiveSupport().getOrCreate()
+  
+      val url = "jdbc:mysql://localhost:3306/big13"
+      var table = "custs"
+      val prop = new Properties()
+      prop.put("drivers", "com.mysql.jdbc.Driver")
+      prop.put("user", "root")
+      prop.put("password", "123456")
+  
+      val df1 = spark.read.jdbc(url, table, prop)
+      df1.show(1000, false)
+  
+    }
+  }
+  
+  ```
+
+## 分布式分析引擎
+
++ 启动spark集群
+
++ 启动spark thriftserver
+  服务器，接受客户端jdbc的请求。
+
+  > $>/soft/spark/sbin/start-thriftserver.sh --master spark://s101:7077
+
++ 验证是否启动成功或者webui
+
+  		> $>netstat -anop | grep 10000
+
++ 连接到thriftserver
+
+  + beeline
+
+    > $>/soft/spark/bi n/beeline
+    > $beeline>!conn jdbc:hive2://localhost:10000/big12 ;
+    >
+    > $beeline>select * from orders ;
+
+		4.2)编程API访问thriftserver
+			a) pom.xml
+		
+		```xml
+		<?xml version="1.0" encoding="UTF-8"?>
+				<project xmlns="http://maven.apache.org/POM/4.0.0"
+						 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+					<modelVersion>4.0.0</modelVersion>
+				<groupId>big13</groupId>
+				<artifactId>myspark-sql</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-sql_2.11</artifactId>
+						<version>2.4.0</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-hive_2.11</artifactId>
+						<version>2.4.0</version>
+					</dependency>
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>5.1.17</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.hive</groupId>
+						<artifactId>hive-jdbc</artifactId>
+						<version>2.1.0</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.hive</groupId>
+						<artifactId>hive-exec</artifactId>
+						<version>2.1.0</version>
+					</dependency>
+			</dependencies>
+		
+		</project>
+		
+		
+	```
+
+b) java类
+
+```java
+package big13.spark.sql;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+/**
+ * 使用Spar SQL分布式查询引擎
+ */
+public class SparkSQLThriftServerDemo1 {
+	public static void main(String[] args) throws Exception {
+		String driver = "org.apache.hive.jdbc.HiveDriver" ;
+		Class.forName(driver);
+		String url = "jdbc:hive2://s101:10000" ;
+
+		Connection conn = DriverManager.getConnection(url) ;
+		PreparedStatement ppst = conn.prepareStatement("select * from big12.orders") ;
+		ResultSet rs = ppst.executeQuery() ;
+		while(rs.next()){
+			int id = rs.getInt("id") ;
+			String orderno = rs.getString("orderno") ;
+			float price = rs.getFloat("price") ;
+			int cid = rs.getInt("cid") ;
+			System.out.printf("%d/%s/%f/%d\r\n" , id , orderno , price ,cid);
+		}
+		rs.close();
+		ppst.close();
+		conn.close();
+	}
+}
+```
+## Spark Streaming
+
+流计算模块 动态数据
+
+准实时计算 内部原理通过小批次计算
+
++ Storm 实时性高 吞吐量小
+
+rdd内分区 分区的数量控制
+
+> spark.streaming.blockInterval=200m
+
+限速
+
+> conf.set("spark.streaming.receiver.maxRate","20")
+
+动态调整接受速率
+
+> conf.set("spark.steaming.backpressure.enabled","true")
+
+### 步骤
+
++ 编写pom.xml
+  			
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 		     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+				<modelVersion>4.0.0</modelVersion>
+			<groupId>big13</groupId>
+			<artifactId>myspark-streaming</artifactId>
+			<version>1.0-SNAPSHOT</version>
+
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.spark</groupId>
+					<artifactId>spark-streaming_2.11</artifactId>
+					<version>2.4.0</version>
+				</dependency>
+			</dependencies>
+</project>
+```
+
++ Scala
+
+```scala
+import org.apache.spark.SparkConf
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+
+object SparkStreamingWordCountScala {
+  def main(args: Array[String]): Unit = {
+    val conf = new SparkConf()
+    // * 动态提取cpu核数
+    conf.setMaster("local[*]")
+    conf.setAppName("StreamingWordsCount")
+    // 流上下文
+    val ssc = new StreamingContext(conf, Seconds(2));
+    val lines = ssc.socketTextStream("localhost", 8888)
+
+    val words = lines.flatMap(_.split(" "))
+    val pair = words.map((_, 1))
+
+    val result = pair.reduceByKey(_ + _)
+    result.print()
+    // 启动上下文
+    ssc.start()
+
+    ssc.awaitTermination()
+
+  }
+}
+
+```
+
++ 启动centos下的nc服务器
+
+  > $>nc -lk 8888 
+
++ 启动流程序
+
++ 配置log4j.properties
+
+  ```properties
+  #
+  # Licensed to the Apache Software Foundation (ASF) under one or more
+  # contributor license agreements.  See the NOTICE file distributed with
+  # this work for additional information regarding copyright ownership.
+  # The ASF licenses this file to You under the Apache License, Version 2.0
+  # (the "License"); you may not use this file except in compliance with
+  # the License.  You may obtain a copy of the License at
+  #
+  #    http://www.apache.org/licenses/LICENSE-2.0
+  #
+  # Unless required by applicable law or agreed to in writing, software
+  # distributed under the License is distributed on an "AS IS" BASIS,
+  # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  # See the License for the specific language governing permissions and
+  # limitations under the License.
+  #
+  
+  # Set everything to be logged to the console
+  log4j.rootCategory=ERROR, console
+  log4j.appender.console=org.apache.log4j.ConsoleAppender
+  log4j.appender.console.target=System.err
+  log4j.appender.console.layout=org.apache.log4j.PatternLayout
+  log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
+  
+  # Set the default spark-shell log level to WARN. When running the spark-shell, the
+  # log level for this class is used to overwrite the root logger's log level, so that
+  # the user can have different defaults for the shell and regular Spark apps.
+  log4j.logger.org.apache.spark.repl.Main=WARN
+  
+  # Settings to quiet third party logs that are too verbose
+  log4j.logger.org.spark_project.jetty=WARN
+  log4j.logger.org.spark_project.jetty.util.component.AbstractLifeCycle=ERROR
+  log4j.logger.org.apache.spark.repl.SparkIMain$exprTyper=INFO
+  log4j.logger.org.apache.spark.repl.SparkILoop$SparkILoopInterpreter=INFO
+  log4j.logger.org.apache.parquet=ERROR
+  log4j.logger.parquet=ERROR
+  
+  # SPARK-9183: Settings to avoid annoying messages when looking up nonexistent UDFs in SparkSQL with Hive support
+  log4j.logger.org.apache.hadoop.hive.metastore.RetryingHMSHandler=FATAL
+  log4j.logger.org.apache.hadoop.hive.ql.exec.FunctionRegistry=ERROR
+  ```
+
++ Java版
+
+  ```java
+  package big13;
+  
+  import org.apache.spark.SparkConf;
+  import org.apache.spark.api.java.function.FlatMapFunction;
+  import org.apache.spark.api.java.function.Function;
+  import org.apache.spark.api.java.function.Function2;
+  import org.apache.spark.api.java.function.PairFunction;
+  import org.apache.spark.streaming.Durations;
+  import org.apache.spark.streaming.api.java.JavaDStream;
+  import org.apache.spark.streaming.api.java.JavaPairDStream;
+  import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
+  import org.apache.spark.streaming.api.java.JavaStreamingContext;
+  import scala.Tuple2;
+  
+  import java.util.Arrays;
+  import java.util.Iterator;
+  
+  public class SparkStreamingWordCountJava {
+      public static void main(String[] args) throws Exception {
+          SparkConf conf = new SparkConf();
+          conf.setAppName("SparkStreamingWordCount");
+          conf.setMaster("local[*]");
+          // 创建Java
+          JavaStreamingContext ssc = new JavaStreamingContext(conf, Durations.seconds(2));
+          // 创建套接字文本流
+          JavaDStream<String> lines = ssc.socketTextStream("192.168.52.154", 8888);
+  
+          JavaDStream<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
+              public Iterator<String> call(String s) throws Exception {
+                  return Arrays.asList(s.split(" ")).iterator();
+              }
+          });
+  
+          JavaPairDStream<String,Integer> pairs = words.mapToPair(new PairFunction<String, String, Integer>() {
+              public Tuple2<String, Integer> call(String s) throws Exception {
+                  return new Tuple2<String, Integer>(s, 1);
+              }
+          });
+  
+  
+          JavaPairDStream<String,Integer> result = pairs.reduceByKey(new Function2<Integer, Integer, Integer>() {
+              public Integer call(Integer v1, Integer v2) throws Exception {
+                  return v1+v2;
+              }
+          });
+  
+          result.print();
+  
+          ssc.start();
+          ssc.awaitTermination();
+  
+  
+  
+      }
+  }
+  
+  ```
+
+### windows操作
+
+```scala
+import org.apache.spark.SparkConf
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+
+object SparkStreamingWordCountWindowsScala {
+  def main(args: Array[String]): Unit = {
+    val conf = new SparkConf()
+    // * 动态提取cpu核数
+    conf.setMaster("local[*]")
+    conf.setAppName("StreamingWordsCount")
+    // 流上下文
+    val ssc = new StreamingContext(conf, Seconds(2));
+    val lines = ssc.socketTextStream("192.168.52.154", 8888)
+
+    val words = lines.flatMap(_.split(" "))
+    val pair = words.map((_, 1))
+	// rdd重复计算  4秒算一次 一次计算之前10秒的数据
+    val result = pair.reduceByKeyAndWindow((a: Int, b: Int) => {
+      a + b
+    }, Seconds(10), Seconds(4))
+    result.print()
+    // 启动上下文
+    ssc.start()
+
+    ssc.awaitTermination()
+
+  }
+}
+
+```
+
+### updateStateByKey
+
+计算历史数据 不消除之前的计算结果
+
++ code
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.streaming.{Seconds, StreamingContext}
+  
+  object SparkStreamingWordCountUpdateStateByKeyScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      // * 动态提取cpu核数
+      conf.setMaster("local[*]")
+      conf.setAppName("StreamingWordsCount")
+      // 流上下文
+      val ssc = new StreamingContext(conf, Seconds(2));
+      val lines = ssc.socketTextStream("192.168.52.154", 8888)
+  
+      val words = lines.flatMap(_.split(" "))
+      val pair = words.map((_, 1))
+  
+  
+      val result = pair.reduceByKey((a: Int, b: Int) => {
+        a + b
+      });
+  
+      def updateFunc(vs: Seq[Int], st: Option[Int]): Option[Int] = {
+        var currCount = 0
+        if (vs != null && !vs.isEmpty) {
+          currCount = vs.sum
+        }
+        var newSt = currCount
+        if (!st.isEmpty) {
+          newSt = newSt + st.get
+        }
+        Some(newSt)
+      }
+  
+      result.updateStateByKey(updateFunc).print()
+  
+      // 启动上下文
+      ssc.start()
+  
+      ssc.awaitTermination()
+  
+    }
+  }
+  
+  ```
+
++ 按key进行状态更新
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.streaming.{Seconds, StreamingContext}
+  
+  import scala.collection.mutable.ArrayBuffer
+  
+  object SparkStreamingWordCountUpdateStateByKeyScala2 {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      // * 动态提取cpu核数
+      conf.setMaster("local[*]")
+      conf.setAppName("StreamingWordsCount")
+      // 流上下文
+      val ssc = new StreamingContext(conf, Seconds(2));
+      val lines = ssc.socketTextStream("192.168.52.154", 8888)
+  
+      val words = lines.flatMap(_.split(" "))
+      val pair = words.map((_, 1))
+  
+  
+      val result = pair.reduceByKey((a: Int, b: Int) => {
+        a + b
+      });
+  
+      // 更新状态函数
+      def updateFunc(vs: Seq[Int], st: Option[ArrayBuffer[(Long, Int)]]): Option[ArrayBuffer[(Long, Int)]] = {
+        // 新状态
+        val buf = new ArrayBuffer[(Long, Int)]()
+        // 提取当前时间毫秒数
+        var ms = System.currentTimeMillis()
+        var currCount = 0
+        // 当前v的数量
+        if (vs != null && !vs.isEmpty) {
+          currCount = vs.sum
+        }
+        //      var oldBuf = ArrayBuffer
+        if (!st.isEmpty) {
+          // 取出旧状态
+          val oldBuf = st.get
+          for (t <- oldBuf) {
+            if (ms - t._1 < 10000) {
+              buf.+=(t)
+            }
+          }
+        }
+        if (currCount != 0) {
+          buf.+=((ms, currCount))
+        }
+  
+        if (buf.isEmpty) {
+          None
+        } else {
+          Some(buf)
+        }
+  
+      }
+  
+      result.updateStateByKey(updateFunc).print()
+  
+      // 启动上下文
+      ssc.start()
+  
+      ssc.awaitTermination()
+  
+    }
+  }
+  
+  ```
+
+  
 
 
 
