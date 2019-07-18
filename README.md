@@ -721,6 +721,9 @@ public class TempAgg {
 		</project>
 		
 		
+		```
+	```
+	
 	```
 
 b) java类
@@ -1100,9 +1103,293 @@ object SparkStreamingWordCountWindowsScala {
   
   ```
 
+### 保存文件
+
++ code
+
+  ```scala
+  import java.io.{File, FileOutputStream}
+  import java.text.SimpleDateFormat
+  import java.util.Date
   
+  import org.apache.spark.SparkConf
+  import org.apache.spark.streaming.{Seconds, StreamingContext}
+  
+  import scala.collection.mutable.ArrayBuffer
+  
+  object SparkStreamingWordCountFileScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      // * 动态提取cpu核数
+      conf.setMaster("local[*]")
+      conf.setAppName("StreamingWordsCount")
+      // 流上下文
+      val ssc = new StreamingContext(conf, Seconds(2));
+      val lines = ssc.socketTextStream("192.168.52.154", 8888)
+  
+      val words = lines.flatMap(_.split(" "))
+      val pair = words.map((_, 1))
+  
+      val result = pair.reduceByKey(_ + _)
+      // 输出大量的小文件
+      // result.saveAsTextFiles("file:///e:/streaming","dat")
+  
+      // 每一个小时保存一次结果
+      result.foreachRDD(rdd => {
+        val rdd2 = rdd.mapPartitionsWithIndex((idx, it) => {
+          val buf: ArrayBuffer[(Int, (String, Int))] = ArrayBuffer[(Int, (String, Int))]()
+          for (t <- it) {
+            buf.+=((idx, t))
+          }
+          buf.iterator
+        })
+  
+        rdd2.foreachPartition(it => {
+          val now = new Date()
+          val sdf = new SimpleDateFormat("yyyy-MM-dd-HH")
+          // 格式化时间串
+          val strDate = sdf.format(now)
+  
+          val itt = it.take(1)
+  
+          if(!itt.isEmpty){
+            val par = itt.next()._1
+            val file = strDate + "-" + par + ".dat"
+            // 需要手动创建文件夹 向文件中追加
+            val fout = new FileOutputStream(new File("e:/stream", file),true)
+            for (t <- it) {
+              val word = t._2._1
+              val cnt = t._2._2
+              fout.write((word + "\t" + cnt + "\r\n").getBytes())
+              fout.flush()
+            }
+  
+            fout.close()
+          }
+        })
+      })
+  
+      // 启动上下文
+      ssc.start()
+      ssc.awaitTermination()
+  
+    }
+  }
+  
+  ```
 
+## Spark Streaming + Spark SQL
 
++ code
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.sql.SparkSession
+  import org.apache.spark.streaming.{Seconds, StreamingContext}
+  
+  /**
+    *
+   */
+  object SparkStreamingSQLWordCountScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      // * 动态提取cpu核数
+      conf.setMaster("local[*]")
+      conf.setAppName("StreamingWordsCount")
+  
+      // SparkSession
+      val spark = SparkSession.builder().config(conf).getOrCreate()
+      // 流上下文
+      val ssc = new StreamingContext(spark.sparkContext, Seconds(2))
+      val lines = ssc.socketTextStream("localhost", 8888)
+  
+      // 压扁变成单词流
+      val words = lines.flatMap(lines=>{
+        lines.split(" ")
+      })
+  
+      words.foreachRDD(rdd=>{
+        import spark.implicits._
+        val df = rdd.toDF("word")
+        df.createOrReplaceTempView("_doc")
+        spark.sql("select word,count(*) from _doc group by word").show(1000,false)
+      })
+  
+      // 启动上下文
+      ssc.start()
+  
+      ssc.awaitTermination()
+  
+    }
+  }
+  
+  ```
+
+  ```java
+  package big13;
+  
+  import org.apache.spark.SparkConf;
+  import org.apache.spark.api.java.JavaPairRDD;
+  import org.apache.spark.api.java.JavaRDD;
+  import org.apache.spark.api.java.JavaSparkContext;
+  import org.apache.spark.api.java.function.*;
+  import org.apache.spark.sql.Dataset;
+  import org.apache.spark.sql.Row;
+  import org.apache.spark.sql.RowFactory;
+  import org.apache.spark.sql.SparkSession;
+  import org.apache.spark.sql.types.DataTypes;
+  import org.apache.spark.sql.types.Metadata;
+  import org.apache.spark.sql.types.StructField;
+  import org.apache.spark.sql.types.StructType;
+  import org.apache.spark.streaming.Durations;
+  import org.apache.spark.streaming.Time;
+  import org.apache.spark.streaming.api.java.JavaDStream;
+  import org.apache.spark.streaming.api.java.JavaPairDStream;
+  import org.apache.spark.streaming.api.java.JavaStreamingContext;
+  import scala.Tuple2;
+  
+  import java.util.ArrayList;
+  import java.util.Arrays;
+  import java.util.Iterator;
+  import java.util.List;
+  
+  public class SparkStreamingSQLWordCountJava {
+      public static void main(final String[] args) throws Exception {
+          SparkConf conf = new SparkConf();
+          conf.setAppName("SparkStreamingWordCount");
+          conf.setMaster("local[*]");
+          // 创建Java
+          final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
+          JavaStreamingContext ssc = new JavaStreamingContext(new JavaSparkContext(spark.sparkContext()), Durations.seconds(2));
+          // 创建套接字文本流
+          JavaDStream<String> lines = ssc.socketTextStream("localhost", 8888);
+  
+          // 压扁
+          JavaDStream<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
+              public Iterator<String> call(String s) throws Exception {
+                  return Arrays.asList(s.split(" ")).iterator();
+              }
+          });
+  
+          words.foreachRDD(new VoidFunction<JavaRDD<String>>() {
+              public void call(JavaRDD<String> rdd) throws Exception {
+                  JavaRDD<Row> rdd2 = rdd.map(new Function<String, Row>() {
+                      public Row call(String s) throws Exception {
+                          return RowFactory.create(s);
+                      }
+                  });
+                  StructField[] fields = new StructField[1];
+                  fields[0] = new StructField("word", DataTypes.StringType, true, Metadata.empty());
+                  StructType type = new StructType(fields);
+                  Dataset<Row> df = spark.createDataFrame(rdd2, type);
+                  // 注册临时视图
+                  df.createOrReplaceTempView("_doc");
+                  spark.sql("select word,count(*) from _doc group by word").show(100, false);
+              }
+          });
+  
+  
+          ssc.start();
+          ssc.awaitTermination();
+  
+  
+      }
+  }
+  
+  ```
+
+## Spark Streming + Kafka
+
++ Java Message Server（JMS）Java消息服务
+
++ 消息中间件
+
+  + destination
+
+    目的地
+
+    队列 p2p
+
+    主题 topic
+
+  + P2P模型
+
+    point to point
+
+  + PubSub模型
+
+    Publish Subscribe
+
++ kafka
+
+  是消息中间件 可以当作很大的缓存
+
+  kafka是消费组 组内只有一个消费者消费一条消息
+
+  topic可以有多个分区
+
++ code
+
+  ```scala
+  package big13
+  
+  import org.apache.kafka.common.serialization.StringDeserializer
+  import org.apache.spark.streaming.kafka010.KafkaUtils
+  import org.apache.spark.streaming.{Seconds, StreamingContext}
+  import org.apache.spark.{SparkConf, SparkContext}
+  import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
+  import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+  
+  
+  object SparkStreamingKafkaScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      conf.setAppName("SparkStreamingKafka")
+      conf.setMaster("local[*]")
+  
+      val ssc = new StreamingContext(conf, Seconds(2))
+  
+      // kafka参数
+      val kafkaParams = Map[String,Object](
+        "bootstrap.servers"->"192.168.52.154:9092,192.168.52.155:9092",
+        "key.deserializer" -> classOf[StringDeserializer],
+        "value.deserializer" -> classOf[StringDeserializer],
+        "group.id" -> "g1",
+        "auto.offset.reset" -> "latest",
+        "enable.auto.commit" -> (false: java.lang.Boolean)
+      )
+  
+      val topics = Array("topic1")
+      val stream = KafkaUtils.createDirectStream[String,String](
+        ssc,
+        // 首选一致性
+        PreferConsistent,
+        //
+        Subscribe[String,String](topics,kafkaParams)
+      )
+  
+      val kv = stream.map(rdd=>{
+        (rdd.key(),rdd.value())
+      })
+  
+      kv.print()
+  
+      ssc.start()
+      ssc.awaitTermination()
+  
+  
+    }
+  }
+  
+  ```
+
++ 开启生产者
+
+  > ./kafka-console-consumer.sh --zookeeper 192.168.52.154:2181 --topic topic1
+
++ 开启消费者
+
+  > ./kafka-console-producer.sh --broker-list 192.168.52.154:9092 --topic topic1
 
 
 
