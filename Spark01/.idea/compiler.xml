@@ -10,10 +10,12 @@
         <module name="taggen" />
         <module name="myspark-streaming" />
         <module name="myspark" />
+        <module name="myspark-mllib" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="myspark" target="1.5" />
+      <module name="myspark-mllib" target="1.5" />
       <module name="myspark-sql" target="1.5" />
       <module name="myspark-streaming" target="1.5" />
       <module name="taggen" target="8" />
