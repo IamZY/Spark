@@ -1393,4 +1393,272 @@ object SparkStreamingWordCountWindowsScala {
 
 
 
+## 线性回归
+
++ Java
+
+  ```java
+  package big13.ml;
+  
+  import javafx.scene.chart.PieChart;
+  import org.apache.spark.SparkConf;
+  import org.apache.spark.api.java.JavaRDD;
+  import org.apache.spark.api.java.JavaSparkContext;
+  import org.apache.spark.api.java.function.Function;
+  import org.apache.spark.ml.feature.LabeledPoint;
+  import org.apache.spark.ml.linalg.Vector;
+  import org.apache.spark.ml.linalg.Vectors;
+  
+  import org.apache.spark.ml.regression.LinearRegression;
+  import org.apache.spark.ml.regression.LinearRegressionModel;
+  import org.apache.spark.sql.Dataset;
+  import org.apache.spark.sql.Row;
+  import org.apache.spark.sql.RowFactory;
+  import org.apache.spark.sql.SparkSession;
+  import org.apache.spark.sql.types.DataTypes;
+  import org.apache.spark.sql.types.Metadata;
+  import org.apache.spark.sql.types.StructField;
+  import org.apache.spark.sql.types.StructType;
+  import scala.Tuple2;
+  
+  public class LinearRegresRedWineDemo1 {
+      public static void main(String[] args) {
+          SparkConf conf = new SparkConf();
+          conf.setMaster("local[*]").setAppName("lr");
+  
+          // SparkSession
+          SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
+          JavaRDD<String> rdd1 = new JavaSparkContext(spark.sparkContext()).textFile("file:///E:/red.csv", 4);
+  
+          // 标签点rdd  对应标签和特征向量
+          JavaRDD<LabeledPoint> rdd2 = rdd1.map(new Function<String, LabeledPoint>() {
+              public LabeledPoint call(String s) throws Exception {
+                  String[] arr = s.split(";");
+                  Double label = Double.parseDouble(arr[11]);
+  
+                  Vector v = Vectors.dense(
+                          Double.parseDouble(arr[0]),
+                          Double.parseDouble(arr[1]),
+                          Double.parseDouble(arr[2]),
+                          Double.parseDouble(arr[3]),
+                          Double.parseDouble(arr[4]),
+                          Double.parseDouble(arr[5]),
+                          Double.parseDouble(arr[6]),
+                          Double.parseDouble(arr[7]),
+                          Double.parseDouble(arr[8]),
+                          Double.parseDouble(arr[9]),
+                          Double.parseDouble(arr[10])
+                  );
+  
+                  return new LabeledPoint(label, v);
+              }
+          });
+  
+          Dataset<Row> df = spark.createDataFrame(rdd2, LabeledPoint.class);
+  //        df.show();
+  
+          Dataset<Row>[] arr =  df.randomSplit(new double[]{0.8, 0.2});
+  
+          Dataset<Row> trainSet = arr[0];
+          Dataset<Row> testSet = arr[1];
+  
+          LinearRegression lr = new LinearRegression();
+          lr.setMaxIter(3);
+  
+          LinearRegressionModel model = lr.train(trainSet);
+          Dataset<Row> pre = model.transform(testSet);
+          pre.show();
+  
+      }
+  }
+  
+  ```
+
+## 逻辑回归
+
++ scala
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.ml.classification.LogisticRegression
+  import org.apache.spark.ml.linalg.Vectors
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    *
+    */
+  object LogisticRegressionWhiteDemo1 {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      conf.setMaster("local[*]").setAppName("mlline")
+  
+      //创建SparkSession
+      val spark = SparkSession.builder().config(conf).getOrCreate()
+  
+      val rdd1 = spark.sparkContext.textFile("file:///e:/white.csv");
+  
+      import spark.implicits._
+  
+      val df1 = rdd1.map(line=>{
+        val arr = line.split(";")
+        val label = if(arr(11).toDouble > 7) 1 else 0
+        val vec = Vectors.dense(
+          arr(0).toDouble,
+          arr(1).toDouble,
+          arr(2).toDouble,
+          arr(3).toDouble,
+          arr(4).toDouble,
+          arr(5).toDouble,
+          arr(6).toDouble,
+          arr(7).toDouble,
+          arr(8).toDouble,
+          arr(9).toDouble,
+          arr(10).toDouble
+        )
+  
+        (label,vec)
+      }).toDF("label","features")
+  
+  
+      val Array(trainData,testData) = df1.randomSplit(Array(0.8,0.2))
+  
+      val lr = new LogisticRegression()
+      lr.setMaxIter(3)
+      val model = lr.fit(trainData)
+  
+      val ret = model.transform(testData)
+  
+      ret.show(100,false)
+  
+    }
+  }
+  
+  ```
+
+## 回归计算器
+
+计算回归算法模型是否最好 
+
++ scala
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.ml.evaluation.RegressionEvaluator
+  import org.apache.spark.ml.linalg.Vectors
+  import org.apache.spark.ml.regression.LinearRegression
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * 评测线性回归模型好坏
+    */
+  object SparkMLLineRegressEvaluatorScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      conf.setMaster("local[*]").setAppName("mlline")
+  
+      //创建SparkSession
+      val spark = SparkSession.builder().config(conf).getOrCreate()
+  
+      //1.定义样例类
+      case class Wine(FixedAcidity: Double,
+                      VolatileAcidity: Double,
+                      CitricAcid: Double,
+                      ResidualSugar: Double,
+                      Chlorides: Double,
+                      FreeSulfurDioxide: Double,
+                      TotalSulfurDioxide: Double,
+                      Density: Double,
+                      PH: Double,
+                      Sulphates: Double,
+                      Alcohol: Double,
+                      Quality: Double)
+  
+      //2.加载csv红酒文件，变换形成rdd
+      val file = "file:///E:\\red.csv";
+      val wineDataRDD = spark.sparkContext.textFile(file)
+        .map(line => {
+          val w = line.split(";")
+          Wine(w(0).toDouble,
+            w(1).toDouble,
+            w(2).toDouble,
+            w(3).toDouble,
+            w(4).toDouble,
+            w(5).toDouble,
+            w(6).toDouble,
+            w(7).toDouble,
+            w(8).toDouble,
+            w(9).toDouble,
+            w(10).toDouble,
+            w(11).toDouble)
+        }
+        )
+  
+  
+      //导入sparksession的隐式转换对象的所有成员，才能将rdd转换成Dataframe
+      import spark.implicits._
+  
+      //创建数据框,变换成(double , Vector)二元组
+      //训练数据集
+      val trainingDF = wineDataRDD.map(w =>
+        (w.Quality,
+          Vectors.dense(
+            w.FixedAcidity,
+            w.VolatileAcidity,
+            w.CitricAcid,
+            w.ResidualSugar,
+            w.Chlorides,
+            w.FreeSulfurDioxide,
+            w.TotalSulfurDioxide,
+            w.Density,
+            w.PH,
+            w.Sulphates,
+            w.Alcohol)
+        )
+      ).toDF("label", "features")
+  
+      trainingDF.show(100, false)
+  
+      //3.创建线性回归对象
+      val lr = new LinearRegression()
+  
+      //4.设置回归对象参数
+      lr.setMaxIter(2)
+      //
+      //5.拟合模型,训练模型
+      val model = lr.fit(trainingDF)
+      //
+      //6.构造测试数据集
+      val testDF = spark.createDataFrame(Seq(
+        (5.0, Vectors.dense(7.4, 0.7, 0.0, 1.9, 0.076, 25.0, 67.0,
+          0.9968, 3.2, 0.68, 9.8)),
+        (5.0, Vectors.dense(7.8, 0.88, 0.0, 2.6, 0.098, 11.0, 34.0,
+          0.9978, 3.51, 0.56, 9.4)),
+        (7.0, Vectors.dense(7.3, 0.65, 0.0, 1.2, 0.065, 15.0, 18.0,
+          0.9968, 3.36, 0.57, 9.5))))
+        .toDF("label", "features")
+      //7.对测试数据集注册临时表
+      testDF.createOrReplaceTempView("test")
+      //8.对测试数据应用模型
+      val result = model.transform(testDF)
+  //    result.show(100, false)
+  
+      // 创建回归计算器
+      val e = new RegressionEvaluator()
+      e.setLabelCol("label")
+      e.setPredictionCol("prediction")
+      // 均方根
+      e.setMetricName("rmse")
+      // 1.0190808640946731 越接近0越好
+      // √[∑di^2/n]=Re
+      val rmse = e.evaluate(result)
+      println(rmse)
+  
+    }
+  }
+  
+  ```
+
+## 贝叶斯
+
+
 
