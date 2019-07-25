@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4a32df41-b072-4dae-8c3d-0cec2f206227" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/myspark-mllib/src/main/java/MuticlassEvaluationScala.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/myspark-mllib/src/main/java/KMeanScala.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala4ML.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myspark-mllib/target/classes/MuticlassEvaluationScala$.class" beforeDir="false" afterPath="$PROJECT_DIR$/myspark-mllib/target/classes/MuticlassEvaluationScala$.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/myspark/target/" />
@@ -41,46 +44,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SparkMLNaiveBayesScala.scala">
+        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="384">
-              <caret line="18" column="36" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="36" />
-              <folding>
-                <element signature="e#0#52#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/NaiveBayesWhiteJava.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="447">
-              <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/LinearRegresRedWineDemo1.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/MuticlassEvaluationScala.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+            <state relative-caret-position="264">
+              <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="20" selection-end-column="70" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
               </folding>
@@ -89,10 +56,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/LogisticRegressionWhiteDemo1.scala">
+        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala4ML.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="14" column="65" lean-forward="true" selection-start-line="10" selection-start-column="4" selection-end-line="14" selection-end-column="65" />
+            <state relative-caret-position="96">
+              <caret line="13" column="5" selection-start-line="13" selection-start-column="5" selection-end-line="18" selection-end-column="28" />
+              <folding>
+                <element signature="e#0#33#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/KMeanScala.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="509">
+              <caret line="31" column="23" selection-start-line="31" selection-start-column="23" selection-end-line="31" selection-end-column="23" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
               </folding>
@@ -124,9 +103,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/taggen/src/main/java/TaggenScala.scala" />
-        <option value="$PROJECT_DIR$/taggen/src/main/java/big13/spark/TagUtils.java" />
-        <option value="$PROJECT_DIR$/taggen/src/main/java/big13/spark/TaggenJava.java" />
         <option value="$PROJECT_DIR$/myspark/src/main/java/big13/spark/RDDDemo1.scala" />
         <option value="$PROJECT_DIR$/myspark/src/main/java/WordCountScalaWithClassType.scala" />
         <option value="$PROJECT_DIR$/myspark/pom.xml" />
@@ -175,6 +151,9 @@
         <option value="$PROJECT_DIR$/myspark-mllib/src/main/java/SparkMLNaiveBayesScala.scala" />
         <option value="$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/NaiveBayesWhiteJava.java" />
         <option value="$PROJECT_DIR$/myspark-mllib/src/main/java/MuticlassEvaluationScala.scala" />
+        <option value="$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala.scala" />
+        <option value="$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala4ML.scala" />
+        <option value="$PROJECT_DIR$/myspark-mllib/src/main/java/KMeanScala.scala" />
       </list>
     </option>
   </component>
@@ -293,7 +272,15 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.MuticlassEvaluationScala">
+  <component name="RunManager" selected="Application.KMeanScala">
+    <configuration name="KMeanScala" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="KMeanScala" />
+      <module name="myspark-mllib" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="LinearRegresRedWineDemo1" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="big13.ml.LinearRegresRedWineDemo1" />
       <module name="myspark-mllib" />
@@ -316,30 +303,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NaiveBayesWhiteJava" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="big13.ml.NaiveBayesWhiteJava" />
-      <module name="myspark-mllib" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="big13.ml.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SparkMLLineRegressEvaluatorScala" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="SparkMLLineRegressEvaluatorScala" />
+    <configuration name="SpamFilterScala" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="SpamFilterScala" />
       <module name="myspark-mllib" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SparkMLNaiveBayesScala" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="SparkMLNaiveBayesScala" />
+    <configuration name="SpamFilterScala4ML" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="SpamFilterScala4ML" />
       <module name="myspark-mllib" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
@@ -370,18 +343,18 @@
     </configuration>
     <list>
       <item itemvalue="Application.LinearRegresRedWineDemo1" />
-      <item itemvalue="Application.SparkMLLineRegressEvaluatorScala" />
-      <item itemvalue="Application.SparkMLNaiveBayesScala" />
-      <item itemvalue="Application.NaiveBayesWhiteJava" />
       <item itemvalue="Application.MuticlassEvaluationScala" />
+      <item itemvalue="Application.SpamFilterScala" />
+      <item itemvalue="Application.SpamFilterScala4ML" />
+      <item itemvalue="Application.KMeanScala" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.KMeanScala" />
+        <item itemvalue="Application.SpamFilterScala4ML" />
+        <item itemvalue="Application.SpamFilterScala" />
         <item itemvalue="Application.MuticlassEvaluationScala" />
         <item itemvalue="Application.LinearRegresRedWineDemo1" />
-        <item itemvalue="Application.NaiveBayesWhiteJava" />
-        <item itemvalue="Application.SparkMLNaiveBayesScala" />
-        <item itemvalue="Application.SparkMLLineRegressEvaluatorScala" />
       </list>
     </recent_temporary>
   </component>
@@ -409,12 +382,12 @@
       <workItem from="1563496882285" duration="7225000" />
       <workItem from="1563521150550" duration="5277000" />
       <workItem from="1563949610330" duration="9447000" />
-      <workItem from="1564025176597" duration="6154000" />
+      <workItem from="1564025176597" duration="14013000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="114896000" />
+    <option name="totallyTimeSpent" value="122755000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -438,7 +411,7 @@
       <window_info id="Capture Tool" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.4036827" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.40651557" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -510,54 +483,6 @@
     <SUITE FILE_PATH="coverage/Spark01$SparkSQLDemo.ic" NAME="SparkSQLDemo Coverage Results" MODIFIED="1563262458604" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/myspark-sql/src/main/java/big13/spark/sql/SparkSQLDemoJava3.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-667">
-          <caret line="36" column="24" lean-forward="true" selection-start-line="36" selection-start-column="24" selection-end-line="36" selection-end-column="24" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1098#1459#0" expanded="true" />
-            <element signature="e#1458#1459#0" expanded="true" />
-            <element signature="e#2044#2405#0" expanded="true" />
-            <element signature="e#2404#2405#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-sql/src/main/java/SparkSQLJsonWriteDemo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-sql/src/main/java/SparkSQLJsonReadDemo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-sql/src/main/java/SparkSQLJDBCWriteDemo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="25" column="34" lean-forward="true" selection-start-line="20" selection-start-column="4" selection-end-line="25" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-sql/src/main/java/SparkSQLJBDCReadDemo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="12" column="23" lean-forward="true" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/myspark-sql/src/main/java/big13/spark/sql/SparlSQLThriftServerDemo.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
@@ -884,40 +809,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SparkMLNaiveBayesScala.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="18" column="36" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#52#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.4.3/spark-core_2.11-2.4.3.jar!/org/apache/spark/api/java/function/Function.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
           <caret line="9" column="7" lean-forward="true" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/NaiveBayesWhiteJava.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="447">
-          <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/LinearRegresRedWineDemo1.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -938,10 +833,84 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-mllib_2.11/2.4.3/spark-mllib_2.11-2.4.3.jar!/org/apache/spark/ml/feature/HashingTF.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="2" column="20" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-mllib_2.11/2.4.3/spark-mllib_2.11-2.4.3.jar!/org/apache/spark/mllib/classification/LogisticRegressionWithSGD.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="21" column="26" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/MuticlassEvaluationScala.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+        <state relative-caret-position="312">
+          <caret line="13" column="65" lean-forward="true" selection-start-line="9" selection-start-column="4" selection-end-line="13" selection-end-column="65" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/LinearRegresRedWineDemo1.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/big13/ml/NaiveBayesWhiteJava.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="447">
+          <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SparkMLNaiveBayesScala.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="12" column="16" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#52#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala4ML.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="13" column="5" selection-start-line="13" selection-start-column="5" selection-end-line="18" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/SpamFilterScala.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="20" selection-end-column="70" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/myspark-mllib/src/main/java/KMeanScala.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="509">
+          <caret line="31" column="23" selection-start-line="31" selection-start-column="23" selection-end-line="31" selection-end-column="23" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
           </folding>
