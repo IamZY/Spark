@@ -1535,7 +1535,7 @@ object SparkStreamingWordCountWindowsScala {
   
   ```
 
-## 回归计算器
+## 回归计算器 RegressEvaluator
 
 计算回归算法模型是否最好 
 
@@ -1708,7 +1708,7 @@ object SparkStreamingWordCountWindowsScala {
 
 ## TF和IDF
 
-词频 term frequence 
+词频 term frequence (hashingTF)
 
 逆文档频率 Inverse document frequence  	$D/d$	= $文章总数/出现单词文章个数$
 
@@ -1784,6 +1784,165 @@ object SparkStreamingWordCountWindowsScala {
   ```
 
 ## Kmeans
+
++ code
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.ml.clustering.KMeans
+  import org.apache.spark.ml.feature.LabeledPoint
+  import org.apache.spark.ml.linalg.Vectors
+  import org.apache.spark.mllib.feature.HashingTF
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * kmean监督
+    */
+  object KMeanScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      conf.setMaster("local[*]").setAppName("mlline")
+  
+      //创建SparkSession
+      val spark = SparkSession.builder().config(conf).getOrCreate()
+      val rdd = spark.read.format("libsvm").load("file:///e:/sample_kmeans_data.txt")
+      val kmeans = new KMeans()
+  
+      kmeans.setK(2).setSeed(1L)
+      val model = kmeans.fit(rdd)
+  
+      import spark.implicits._
+  
+      val test = spark.sparkContext.makeRDD(Array(
+        new LabeledPoint(7, Vectors.dense(1.1, 1.2, 1.3)),
+        new LabeledPoint(8, Vectors.dense(8.9, 8.8, 8.7))
+      )).toDF("label", "features")
+  
+      val ret = model.transform(test)
+      ret.show(100, false)
+  
+    }
+  }
+  
+  ```
+
+## Tokenizer
+
+分词 _.split(" ")
+
++ code
+
+  ```scala
+  import org.apache.spark.SparkConf
+  import org.apache.spark.ml.feature.Tokenizer
+  import org.apache.spark.sql.SparkSession
+  
+  /**
+    * 分词器
+    */
+  object TokenizerScala {
+    def main(args: Array[String]): Unit = {
+      val conf = new SparkConf()
+      conf.setAppName("ml_linearRegress")
+      conf.setMaster("local[*]")
+  
+      //创建SparkSession
+      val spark = SparkSession.builder().config(conf).getOrCreate()
+      import spark.implicits._
+  
+      //数据
+      val df1 = spark.createDataFrame(Seq(
+        (0, "Hi ! I heard about Spark ."),
+        (1, "I wish Java could use case classes"),
+        (2, "Logistic,regression,models,are,neat")
+      )).toDF("id", "sentence")
+  
+      df1.show(10, false)
+  
+      //创建分词器
+      val token = new Tokenizer()
+      token.setInputCol("sentence")
+      token.setOutputCol("words")
+      val df2 = token.transform(df1);
+      df2.show(10, false)
+  
+    }
+  }
+  
+  ```
+
+## RegexTokenizer
+
+支持正则表达式分词
+
+## Word中文分词
+
+## 推荐系统
+
++ 推荐系统的好坏指标
+  + 用户满意度
+  + 预测准确度
+  + 覆盖率
+  + 多样性
+    + 推荐商品的两两之间的不相似性
+  + 新颖性
+  + 惊喜度
+  + 信任度
+  + 实时性
+  + 健壮性
+
++ 用户行为数据
+  + 隐式反馈
+  + 显式反馈
+    + 量少 精准 反馈有正负
+
++ 基于领域的算法
+  + 基于用户的协同过滤
+    + 找到相似的人
+  + 基于商品的协同过滤
+    + 找相似的商品（和购买过|交互的商品）
++ 相似度计算
+  + jaccard
+  + cosine
+  + john breese
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
