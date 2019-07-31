@@ -10,7 +10,6 @@
         <module name="taggen" />
         <module name="myspark-streaming" />
         <module name="myspark" />
-        <module name="myspark-mllib" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

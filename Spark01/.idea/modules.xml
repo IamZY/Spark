@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Spark01.iml" filepath="$PROJECT_DIR$/Spark01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mypython/mypython.iml" filepath="$PROJECT_DIR$/mypython/mypython.iml" />
       <module fileurl="file://$PROJECT_DIR$/myspark/myspark.iml" filepath="$PROJECT_DIR$/myspark/myspark.iml" />
-      <module fileurl="file://$PROJECT_DIR$/myspark-mllib/myspark-mllib.iml" filepath="$PROJECT_DIR$/myspark-mllib/myspark-mllib.iml" />
       <module fileurl="file://$PROJECT_DIR$/myspark-sql/myspark-sql.iml" filepath="$PROJECT_DIR$/myspark-sql/myspark-sql.iml" />
       <module fileurl="file://$PROJECT_DIR$/myspark-streaming/myspark-streaming.iml" filepath="$PROJECT_DIR$/myspark-streaming/myspark-streaming.iml" />
       <module fileurl="file://$PROJECT_DIR$/taggen/taggen.iml" filepath="$PROJECT_DIR$/taggen/taggen.iml" />
